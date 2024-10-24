@@ -7,6 +7,8 @@ class Option(models.Model):
     name = models.CharField(max_length=100)
     addition = models.FloatField(default=0)
     active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -19,6 +21,8 @@ class Additional(models.Model):
     minimum = models.IntegerField()
     options = models.ManyToManyField(Option)
     active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -34,6 +38,8 @@ class Product(models.Model):
     ingredients = models.CharField(max_length=2000)
     additionals = models.ManyToManyField(Additional, blank=True)
     active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
