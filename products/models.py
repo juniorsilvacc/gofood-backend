@@ -29,7 +29,7 @@ class Additional(models.Model):
 
 
 class Product(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True, unique=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to='products', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
