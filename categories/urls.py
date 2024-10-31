@@ -3,6 +3,9 @@ from . import views
 
 
 urlpatterns = [
+    path('categories/', views.CategoryListCreateView.as_view(), name='category-create-list'),
+    path('categories/<int:pk>/', views.CategoryRetrieveUpdateDestroy.as_view(), name='category-detail-update-destroy'),
+
     path('categories/', views.CategoryListView.as_view(), name='categories'),
     path('categories/create/', views.CategoryCreateView.as_view(), name='category_create'),
     path('categories/<int:pk>/detail/', views.CategoryDetailView.as_view(), name='category_detail'),
