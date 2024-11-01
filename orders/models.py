@@ -24,6 +24,7 @@ class Address(models.Model):
     street = models.CharField(max_length=100)
     number = models.CharField(max_length=20)
     district = models.CharField(max_length=50, blank=True)
+    reference = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -47,9 +48,7 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
     address = models.ForeignKey(Address, on_delete=models.PROTECT)
     payment = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
-    reference = models.CharField(max_length=200, blank=True)
     date = models.DateTimeField(default=datetime.now)
-    telephone = models.CharField(max_length=30)
     delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
