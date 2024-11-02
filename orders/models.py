@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
-from products.models import Product
+from products.models import Product, Additional
 from django.core.validators import MinValueValidator
 
 
@@ -59,7 +59,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(
         validators=[
@@ -67,6 +67,7 @@ class OrderItem(models.Model):
         ]
     )
     price = models.FloatField()
+    additionals = models.ManyToManyField(Additional, blank=True)
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -32,6 +32,8 @@ class OptionSerializer(NamValidationMixin, serializers.ModelSerializer):
 
 # Serializer Additional
 class AdditionalSerializer(serializers.ModelSerializer):
+    options = OptionSerializer(many=True)
+    
     class Meta:
         model = Additional
         fields = '__all__'
@@ -97,3 +99,10 @@ class ProductListDetailSerializer(serializers.ModelSerializer):
             }
             for additional in obj.additionals.all()
         ]
+
+
+class AdditionalOptionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    options = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=True
+    )

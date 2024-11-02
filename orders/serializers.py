@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from products.models import Product
+from products.models import Product, Additional, Option
 from orders.models import Coupon, Address, Order, OrderItem
-
+from products.serializers import AdditionalSerializer
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,7 +31,7 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = '__all__'
 
-    def validate_zipe_code(self, value):
+    def validate_zip_code(self, value):
         if value and (not value.isdigit() or len(value) != 8):
             raise serializers.ValidationError("O CEP deve ter exatamente 8 dígitos numéricos.")
         return value
@@ -39,6 +39,7 @@ class AddressSerializer(serializers.ModelSerializer):
     def validate_number(self, value):
         if not value.islnum():
             raise serializers.ValidationError("O número deve ser alfanumérico.")
+        return value
 
     def validate_street(self, value):
         if len(value) < 3:
@@ -51,35 +52,12 @@ class AddressSerializer(serializers.ModelSerializer):
         return value
 
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['user', 'total', 'change_due', 'coupon', 'address', 'payment']
-
-    def validate_coupon(self, value):
-        if value and not value.active:
-            raise serializers.ValidationError("Este cupom não está mais ativo.")
-        return value
-
-    def validate_total(self, value):
-        if value < 0:
-            raise serializers.ValidationError("O valor total do pedido deve ser maior que zero.")
-        return value
-
-    def create(self, validated_data):
-        coupon = validated_data.get('coupon')
-        if coupon:
-            discount = coupon.discount / 100
-            validated_data['total'] *= (1 - discount)
-            coupon.uses += 1
-            coupon.save()
-        return super().create(validated_data)
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
+    additionals = serializers.PrimaryKeyRelatedField(queryset=Additional.objects.all(), many=True)
+    
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price', 'description']
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'description', 'additionals']
 
     def validate_quantity(self, value):
         if value <= 0:
@@ -104,11 +82,37 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return data
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, required=False)
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'total', 'change_due', 'coupon', 'address', 'payment', 'date', 'delivered', 'items', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+    def validate_coupon(self, value):
+        if value and not value.active:
+            raise serializers.ValidationError("Este cupom não está mais ativo.")
+        return value
+
+    def validate_total(self, value):
+        if value < 0:
+            raise serializers.ValidationError("O valor total do pedido deve ser maior que zero.")
+        return value
+    
+    def create(self, validated_data):
+        items_data = validated_data.pop('items', [])
+        order = Order.objects.create(**validated_data)
+        for item_data in items_data:
+            OrderItem.objects.create(order=order, **item_data)
+        return order
+
+
 class OrderDetailSerializer(serializers.ModelSerializer):
     coupon = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
-    items = OrderItemSerializer(many=True, source='orderitem_set')
-
+    items = OrderItemSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Order
         fields = ['id', 'user', 'total', 'change_due', 'coupon', 'address', 'payment', 'date', 'delivered', 'items', 'created_at', 'updated_at']

@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from orders.models import Coupon, Address, Order
 from orders.serializers import CouponSerializer, AddressSerializer, OrderSerializer, OrderItemSerializer, OrderDetailSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class CouponListCreateView(generics.ListCreateAPIView):
@@ -28,13 +29,16 @@ class AddressRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 
 class OrderCreateView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
-            order = serializer.save()
+            order = serializer.save(user=request.user)
+            order_data = OrderSerializer(order).data
             return Response({
-                "message": "Pedido criado com sucesso.",
-                "order_id": order.id
+                "message": "Pedido feito! O seu pedido já está em preparo.",
+                "order": order_data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
