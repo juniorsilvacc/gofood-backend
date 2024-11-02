@@ -17,12 +17,13 @@ class AdditionalAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'display_image', 'category', 'price', 'active',)
+    list_display = ('display_image', 'name', 'category', 'price', 'active',)
     search_fields = ('name',)
     list_filter = ('category',)
+    list_editable = ('price', 'active',)
 
     def display_image(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="width: 50px; height: auto;" />', obj.image.url)
+            return format_html('<img src="{}" style="width: 35px; height: auto;" />', obj.image.url)
         return "No Image"
     display_image.short_description = 'Image'
