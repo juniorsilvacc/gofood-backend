@@ -17,7 +17,7 @@ class AdditionalAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('display_image', 'name', 'category', 'price', 'active',)
+    list_display = ('id', 'display_image', 'name', 'category', 'price', 'active',)
     search_fields = ('name',)
     list_filter = ('category',)
     list_editable = ('price', 'active',)

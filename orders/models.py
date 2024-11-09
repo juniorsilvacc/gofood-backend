@@ -52,25 +52,41 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def total(self):
+        total_items = sum(item.get_total_price() for item in self.order_items.all())
+        if self.coupon:
+            total_items -= self.coupon.discount
+        return max(total_items, 0)
 
     def __str__(self):
-        return f'Order {self.id}'
+        return f"Order {self.id} - Total: {self.total}"
 
 
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(
         validators=[
-            MinValueValidator(1, 'O valor não pode ser menor que R$ 1.0')
+            MinValueValidator(1, 'A quantidade não pode ser menor que 1')
         ]
     )
-    price = models.FloatField()
     additionals = models.ManyToManyField(Additional, blank=True)
-    description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def price(self):
+        return self.product.price
+    
+    @property
+    def description(self):
+        return self.product.description
+    
+    def get_total_price(self):
+        return self.price * self.quantity
 
     def __str__(self) -> str:
         return f'Order Item {self.id} - {self.product.name} x {self.quantity}'

@@ -4,7 +4,7 @@ from .models import Coupon, Address, Order, OrderItem
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ('code', 'discount', 'uses', 'active')
+    list_display = ('id', 'code', 'discount', 'uses', 'active')
     readonly_fields = ('uses',)
     list_filter = ('active',)
     list_editable = ('active', 'discount',)
