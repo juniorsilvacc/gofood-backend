@@ -9,21 +9,25 @@ from rest_framework.permissions import IsAuthenticated
 
 
 class CouponListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
 
 
 class CouponRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
 
 
 class AddressListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
 
 class AddressRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
 
@@ -44,6 +48,8 @@ class OrderCreateView(APIView):
 
 
 class OrderItemCreateView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, *args, **kwargs):
         serializer = OrderItemSerializer(data=request.data)
         if serializer.is_valid():
@@ -53,6 +59,8 @@ class OrderItemCreateView(APIView):
 
 
 class OrderDetailView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, id, *args, **kwargs):
         order = get_object_or_404(Order, id=id)
         serializer = OrderDetailSerializer(order)

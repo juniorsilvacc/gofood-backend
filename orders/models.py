@@ -76,17 +76,17 @@ class OrderItem(models.Model):
     additionals = models.ManyToManyField(Additional, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     @property
     def price(self):
         return self.product.price
-    
+
     @property
     def description(self):
         return self.product.description
-    
+
     def get_total_price(self):
-        return self.price * self.quantity
+        return self.product.price * self.quantity
 
     def __str__(self) -> str:
         return f'Order Item {self.id} - {self.product.name} x {self.quantity}'

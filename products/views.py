@@ -3,19 +3,23 @@ from products.models import Option
 from products.models import Additional
 from products.models import Product
 from products.serializers import ProductSerializer, ProductListDetailSerializer, OptionSerializer, AdditionalSerializer, AdditionalListDetailSerializer
+from rest_framework.permissions import IsAuthenticated
 
 
 class OptionListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
 
 
 class OptionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
 
 
 class AdditionalListCreateView(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Additional.objects.all()
     serializer_class = AdditionalSerializer
 
@@ -26,6 +30,7 @@ class AdditionalListCreateView(generics.ListCreateAPIView):
 
 
 class AdditionalRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Additional.objects.all()
     serializer_class = AdditionalSerializer
 
@@ -52,9 +57,15 @@ class ProductListCreateView(generics.ListCreateAPIView):
             queryset = queryset.filter(name__icontains=search)
 
         return queryset
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return []
 
 
 class ProductRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -62,3 +73,8 @@ class ProductRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             return ProductListDetailSerializer
         return ProductSerializer
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return []
+        return [IsAuthenticated()]

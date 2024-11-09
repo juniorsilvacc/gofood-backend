@@ -6,6 +6,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView, D
 from categories.forms import CategoryModelForm
 from categories.serializers import CategorySerializer
 from django.urls import reverse_lazy
+from rest_framework.permissions import IsAuthenticated
 
 
 class CategoryListCreateView(generics.ListCreateAPIView):
@@ -22,9 +23,15 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         serializer = CategorySerializer(categories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return []
 
 
 class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
