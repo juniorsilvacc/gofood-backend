@@ -61,8 +61,18 @@ class Order(models.Model):
         return max(total_items, 0)
 
     def save(self, *args, **kwargs):
-        self.total_value = self.total
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)  # Salva o objeto e atribui um ID
+
+        total_value = sum(item.get_total_price() for item in self.order_items.all())  # Calcula o valor total
+
+        if self.coupon:
+            total_value -= self.coupon.discount  # Aplica o desconto do cupom
+
+        if total_value < 0:
+            total_value = 0  # Impede que o valor total fique negativo
+
+        self.total_value = total_value
+        super().save(update_fields=["total_value"])  # Atualiza o total_value no banco de dados
 
     def __str__(self):
         return f"Order {self.id} - Total: {self.total}"

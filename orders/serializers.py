@@ -105,6 +105,15 @@ class OrderSerializer(serializers.ModelSerializer):
         # Criar os OrderItems e vinculá-los à Order
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
+
+        # Agora que o pedido foi salvo, calcular o total_value
+        total_value = sum(item.get_total_price() for item in order.order_items.all())
+        if order.coupon:
+            total_value -= order.coupon.discount
+
+        order.total_value = total_value
+        order.save(update_fields=["total_value"])
+
         return order
 
 

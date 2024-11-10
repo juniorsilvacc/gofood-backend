@@ -43,12 +43,16 @@ class OrderCreateView(APIView):
 
             # Vincular OrderItems que ainda não têm uma Order associada
             order_items = OrderItem.objects.filter(order__isnull=True)
+
             for item in order_items:
                 item.order = order
                 item.save()
 
+            order_data = OrderSerializer(order).data
+
             return Response({
-                "message": "Pedido feito! O seu pedido já está em preparo."
+                "message": "Pedido feito! O seu pedido já está em preparo.",
+                "order": order_data
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
