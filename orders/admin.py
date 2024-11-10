@@ -35,4 +35,6 @@ class OrderAdmin(admin.ModelAdmin):
     def display_address(self, obj):
         return f"{obj.address.zip_code}, {obj.address.street}, {obj.address.district}, {obj.address.number}, {obj.address.reference}"
     display_address.short_description = 'Address'
+
+
 admin.site.register(Order, OrderAdmin)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from products.models import Product, Additional, Option
+from products.models import Product, Additional
 from orders.models import Coupon, Address, Order, OrderItem
-from products.serializers import AdditionalSerializer
+
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,7 +54,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     additionals = serializers.PrimaryKeyRelatedField(queryset=Additional.objects.all(), many=True)
-    
+
     class Meta:
         model = OrderItem
         fields = ['id', 'order', 'product', 'quantity', 'price', 'description', 'additionals']
@@ -70,11 +70,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        order = data.get('order')
+        # Se o 'product' for fornecido, verifique se existe
         product = data.get('product')
-
-        if not Order.objects.filter(id=order.id).exists():
-            raise serializers.ValidationError("O pedido especificado não existe.")
 
         if not Product.objects.filter(id=product.id).exists():
             raise serializers.ValidationError("O produto especificado não existe.")
@@ -84,7 +81,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, required=False)
-    
+
     class Meta:
         model = Order
         fields = ['id', 'user', 'total', 'change_due', 'coupon', 'address', 'payment', 'date', 'delivered', 'items', 'created_at', 'updated_at']
@@ -99,10 +96,13 @@ class OrderSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("O valor total do pedido deve ser maior que zero.")
         return value
-    
+
     def create(self, validated_data):
+        # Extrair itens do pedido
         items_data = validated_data.pop('items', [])
+        # Criar o pedido
         order = Order.objects.create(**validated_data)
+        # Criar os OrderItems e vinculá-los à Order
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
         return order
@@ -112,7 +112,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     coupon = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     items = OrderItemSerializer(source='order_items', many=True, read_only=True)
-    
+
     class Meta:
         model = Order
         fields = ['id', 'user', 'total', 'change_due', 'coupon', 'address', 'payment', 'date', 'delivered', 'items', 'created_at', 'updated_at']

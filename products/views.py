@@ -57,7 +57,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
             queryset = queryset.filter(name__icontains=search)
 
         return queryset
-    
+
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated()]
@@ -73,7 +73,7 @@ class ProductRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             return ProductListDetailSerializer
         return ProductSerializer
-    
+
     def get_permissions(self):
         if self.request.method == 'GET':
             return []

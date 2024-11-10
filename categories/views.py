@@ -23,7 +23,7 @@ class CategoryListCreateView(generics.ListCreateAPIView):
         serializer = CategorySerializer(categories, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated()]

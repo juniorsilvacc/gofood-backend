@@ -43,7 +43,7 @@ class Order(models.Model):
 
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    total = models.FloatField()
+    total_value = models.FloatField(default=0)
     change_due = models.CharField(blank=True, max_length=20)
     coupon = models.ForeignKey(Coupon, null=True, blank=True, on_delete=models.SET_NULL)
     address = models.ForeignKey(Address, on_delete=models.PROTECT)
@@ -52,7 +52,7 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     @property
     def total(self):
         total_items = sum(item.get_total_price() for item in self.order_items.all())
@@ -60,13 +60,17 @@ class Order(models.Model):
             total_items -= self.coupon.discount
         return max(total_items, 0)
 
+    def save(self, *args, **kwargs):
+        self.total_value = self.total
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Order {self.id} - Total: {self.total}"
 
 
 class OrderItem(models.Model):
     id = models.AutoField(primary_key=True)
-    order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, related_name='order_items', on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(
         validators=[

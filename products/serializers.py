@@ -5,7 +5,6 @@ from products.models import Product
 import re
 
 
-# Mixin para validações comuns
 class NamValidationMixin:
     def validate_name(self, value):
         if len(value) < 3:
@@ -19,7 +18,6 @@ class NamValidationMixin:
             raise serializers.ValidationError({"name": "Já existe um produto com esse nome."})
 
 
-# Serializer Option
 class OptionSerializer(NamValidationMixin, serializers.ModelSerializer):
     class Meta:
         model = Option
@@ -30,10 +28,9 @@ class OptionSerializer(NamValidationMixin, serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-# Serializer Additional
 class AdditionalSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True)
-    
+
     class Meta:
         model = Additional
         fields = '__all__'
@@ -50,7 +47,13 @@ class AdditionalListDetailSerializer(serializers.ModelSerializer):
         return [{"id": option.id, "name": option.name, "addition": option.addition} for option in obj.options.all()]
 
 
-# Serializer Product
+class AdditionalOptionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    options = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=True
+    )
+
+
 class ProductSerializer(NamValidationMixin, serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -99,10 +102,3 @@ class ProductListDetailSerializer(serializers.ModelSerializer):
             }
             for additional in obj.additionals.all()
         ]
-
-
-class AdditionalOptionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    options = serializers.ListField(
-        child=serializers.IntegerField(), allow_empty=True
-    )
