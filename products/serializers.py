@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from products.models import Option
-from products.models import Additional
 from products.models import Product
 import re
 
@@ -26,32 +25,6 @@ class OptionSerializer(NamValidationMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         self.check_name_uniqueness(Option, validated_data.get('name'))
         return super().create(validated_data)
-
-
-class AdditionalSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True)
-
-    class Meta:
-        model = Additional
-        fields = '__all__'
-
-
-class AdditionalListDetailSerializer(serializers.ModelSerializer):
-    options = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Additional
-        fields = ['id', 'name', 'quantity_options', 'active', 'options']
-
-    def get_options(self, obj):
-        return [{"id": option.id, "name": option.name, "addition": option.addition} for option in obj.options.all()]
-
-
-class AdditionalOptionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    options = serializers.ListField(
-        child=serializers.IntegerField(), allow_empty=True
-    )
 
 
 class ProductSerializer(NamValidationMixin, serializers.ModelSerializer):
@@ -82,23 +55,21 @@ class ProductSerializer(NamValidationMixin, serializers.ModelSerializer):
 
 class ProductListDetailSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
-    additionals = serializers.SerializerMethodField()
+    options = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'ingredients', 'price', 'image', 'active', 'category', 'additionals']
+        fields = ['id', 'name', 'description', 'ingredients', 'price', 'image', 'active', 'category', 'options']
 
     def get_category(self, obj):
         if obj.category:
             return {"id": obj.category.id, "name": obj.category.name}
         return None
 
-    def get_additionals(self, obj):
+    def get_options(self, obj):
         return [
             {
-                "name": additional.name,
-                "quantity_options": additional.quantity_options,
-                "options": [{"name": option.name, "addition": option.addition} for option in additional.options.all()]
+                "name": option.name, "addition": option.addition
             }
-            for additional in obj.additionals.all()
+            for option in obj.options.all()
         ]

@@ -73,9 +73,10 @@ class OrderDetailView(APIView):
         serializer = OrderDetailSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class MyOrdersListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = OrderDetailSerializer
-    
+
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)

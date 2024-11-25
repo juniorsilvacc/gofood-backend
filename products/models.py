@@ -1,30 +1,12 @@
 from django.db import models
 from categories.models import Category
-from django.core.validators import MaxValueValidator
+from django.core.exceptions import ValidationError
 
 
 class Option(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, unique=True)
     addition = models.FloatField(default=0)
-    active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-
-
-class Additional(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    quantity_options = models.IntegerField(
-        default=0,
-        validators=[
-            MaxValueValidator(3, 'O máximo é 3')
-        ]
-    )
-    options = models.ManyToManyField(Option)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,10 +23,22 @@ class Product(models.Model):
     price = models.FloatField()
     description = models.TextField()
     ingredients = models.CharField(max_length=2000)
-    additionals = models.ManyToManyField(Additional, blank=True)
+    options = models.ManyToManyField(Option, blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        MAX_OPTIONS = 3
+
+        if self.pk:
+            if self.options.count() > MAX_OPTIONS:
+                raise ValidationError(f"Um produto não pode ter mais que {MAX_OPTIONS} opções.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

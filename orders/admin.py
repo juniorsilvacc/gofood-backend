@@ -18,7 +18,7 @@ class AddressAdmin(admin.ModelAdmin):
 
 
 class OrderItemInline(admin.TabularInline):
-    readonly_fields = ('product', 'quantity', 'price', 'description', 'additionals',)
+    readonly_fields = ('product', 'quantity', 'price', 'description', 'options',)
     model = OrderItem
     extra = 1
 

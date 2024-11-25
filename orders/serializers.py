@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from products.models import Product, Additional
+from products.models import Product, Option
 from orders.models import Coupon, Address, Order, OrderItem
+from products.serializers import OptionSerializer
 
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -53,11 +54,19 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    additionals = serializers.PrimaryKeyRelatedField(queryset=Additional.objects.all(), many=True)
+    options = serializers.PrimaryKeyRelatedField(queryset=Option.objects.all(), many=True)
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'order', 'product', 'quantity', 'price', 'description', 'additionals']
+        fields = ['id', 'order', 'product', 'quantity', 'price', 'description', 'options']
+
+    def get_options(self, obj):
+        # Retorna apenas 'id' e 'name' das opções associadas ao produto
+        product = obj.product  # O 'product' é uma ForeignKey em OrderItem
+        if product:
+            options = Option.objects.filter(id__in=obj.options.values_list('id', flat=True))
+            return OptionSerializer(options, many=True).data  # Aqui estamos usando o OptionSerializer para incluir somente 'id' e 'name'
+        return []  # Retorna uma lista vazia se não houver opções
 
     def validate_quantity(self, value):
         if value <= 0:

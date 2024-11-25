@@ -1,8 +1,7 @@
 from rest_framework import generics
 from products.models import Option
-from products.models import Additional
 from products.models import Product
-from products.serializers import ProductSerializer, ProductListDetailSerializer, OptionSerializer, AdditionalSerializer, AdditionalListDetailSerializer
+from products.serializers import ProductSerializer, ProductListDetailSerializer, OptionSerializer
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -16,28 +15,6 @@ class OptionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
-
-
-class AdditionalListCreateView(generics.ListCreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Additional.objects.all()
-    serializer_class = AdditionalSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return AdditionalListDetailSerializer
-        return AdditionalSerializer
-
-
-class AdditionalRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = Additional.objects.all()
-    serializer_class = AdditionalSerializer
-
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return AdditionalListDetailSerializer
-        return AdditionalSerializer
 
 
 class ProductListCreateView(generics.ListCreateAPIView):

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from datetime import datetime
-from products.models import Product, Additional
+from products.models import Product, Option
 from django.core.validators import MinValueValidator
 
 
@@ -87,7 +87,7 @@ class OrderItem(models.Model):
             MinValueValidator(1, 'A quantidade não pode ser menor que 1')
         ]
     )
-    additionals = models.ManyToManyField(Additional, blank=True)
+    options = models.ManyToManyField(Option, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -100,7 +100,16 @@ class OrderItem(models.Model):
         return self.product.description
 
     def get_total_price(self):
-        return self.product.price * self.quantity
+        # Calcula o preço base do produto multiplicado pela quantidade
+        total_price = self.product.price * self.quantity
+        
+        # Adiciona o preço de cada opção selecionada
+        options_total = sum(option.addition for option in self.options.all())
+        
+        # Soma o preço total das opções ao total do produto
+        total_price += options_total
+        
+        return total_price
 
     def __str__(self) -> str:
         return f'Order Item {self.id} - {self.product.name} x {self.quantity}'
