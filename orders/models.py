@@ -102,13 +102,13 @@ class OrderItem(models.Model):
     def get_total_price(self):
         # Calcula o preço base do produto multiplicado pela quantidade
         total_price = self.product.price * self.quantity
-        
+
         # Adiciona o preço de cada opção selecionada
         options_total = sum(option.addition for option in self.options.all())
-        
+
         # Soma o preço total das opções ao total do produto
         total_price += options_total
-        
+
         return total_price
 
     def __str__(self) -> str:
