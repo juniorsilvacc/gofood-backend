@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
-    telephone = serializers.CharField(write_only=True, required=True)
+    telephone = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
