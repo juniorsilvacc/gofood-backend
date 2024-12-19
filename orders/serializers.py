@@ -38,7 +38,7 @@ class AddressSerializer(serializers.ModelSerializer):
         return value
 
     def validate_number(self, value):
-        if not value.islnum():
+        if not value.isalnum():
             raise serializers.ValidationError("O número deve ser alfanumérico.")
         return value
 

@@ -6,8 +6,8 @@ urlpatterns = [
     path('coupons/', views.CouponListCreateView.as_view(), name='coupon-create-list'),
     path('coupons/<int:pk>/', views.CouponRetrieveUpdateDestroy.as_view(), name='coupon-detail-update-destroy'),
 
-    path('addresses/', views.AddressListCreateView.as_view(), name='address-create-list'),
-    path('addresses/<int:pk>/', views.AddressRetrieveUpdateDestroy.as_view(), name='address-detail-update-destroy'),
+    path('addresses/create/', views.AddressCreateView.as_view(), name='address-create'),
+    path('addresses/list/', views.AddressListView.as_view(), name='addresses-list'),
 
     path('orders/', views.OrderCreateView.as_view(), name='order-create'),
     path('orders/<int:id>/', views.OrderDetailView.as_view(), name='order-detail'),

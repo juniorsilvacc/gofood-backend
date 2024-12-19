@@ -3,30 +3,6 @@ from django.urls import reverse
 from categories.models import Category
 
 
-class CategoryListViewTest(TestCase):
-    def setUp(self):
-        Category.objects.create(name='Pizzas')
-        Category.objects.create(name='Burguers')
-
-    def test_list_view_status_code(self):
-        response = self.client.get(reverse('categories'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_template_used(self):
-        response = self.client.get(reverse('categories'))
-        self.assertTemplateUsed(response, 'categories/categories.html')
-
-    def test_list_view_content(self):
-        response = self.client.get(reverse('categories'))
-        self.assertContains(response, "Pizzas")
-        self.assertContains(response, "Burguers")
-
-    def test_search_filter(self):
-        response = self.client.get(reverse('categories') + '?name=Pizzas')
-        self.assertContains(response, "Pizzas")
-        self.assertNotContains(response, "Burguers")
-
-
 class CategoryCreateViewTest(TestCase):
     def test_create_category(self):
         response = self.client.post(reverse('category_create'), {

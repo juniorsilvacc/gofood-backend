@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+from decouple import config
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q_@q#yi#y3*8u!w@7m$mpeacrka%0u(e(%a$5h)bi5tzg)q@mf'
+SECRET_KEY = config('SECRET_KEY', default='unsafe-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 
 # Application definition
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'authentication',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -83,12 +85,17 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST', 'localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
     }
-}
 
 
 # Password validation
@@ -137,13 +144,34 @@ MEDIA_URL = '/media/'
 
 # AUTHENTICATION
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # AUTHENTICATION TIME
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+# OpenAPI 3
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'GoFood API',
+    'DESCRIPTION': 'My Delivery',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {'name': 'v1', 'description': 'Gerencie autenticação, incluindo registro, login e validação de tokens.'},
+        {'name': 'Categories', 'description': 'Gerencie categorias de produtos para organização e consulta.'},
+        {'name': 'Coupon', 'description': 'Criação, edição, listagem e exclusão de cupons de desconto.'},
+        {'name': 'Address', 'description': 'Operações para criar e listar endereços de entrega.'},
+        {'name': 'Order', 'description': 'Criação de pedidos, listagem de pedidos do usuário e consulta detalhada de pedidos.'},
+        {'name': 'OrderItem', 'description': 'Gerencie itens de pedidos, incluindo produtos, adicionais e quantidades.'},
+        {'name': 'Option', 'description': 'Criação, edição, listagem e exclusão de opções relacionadas aos produtos.'},
+        {'name': 'Product', 'description': 'Gerencie produtos, incluindo criação, listagem, busca e edição.'},
+    ],
 }

@@ -3,20 +3,24 @@ from products.models import Option
 from products.models import Product
 from products.serializers import ProductSerializer, ProductListDetailSerializer, OptionSerializer
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(tags=["Option"])
 class OptionListCreateView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
 
 
+@extend_schema(tags=["Option"])
 class OptionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Option.objects.all()
     serializer_class = OptionSerializer
 
 
+@extend_schema(tags=["Product"])
 class ProductListCreateView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -41,6 +45,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
         return []
 
 
+@extend_schema(tags=["Product"])
 class ProductRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Product.objects.all()
