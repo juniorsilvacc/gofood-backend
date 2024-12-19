@@ -10,10 +10,10 @@ O <b>GoFood</b> é uma API RESTful desenvolvida para simplificar e otimizar a ge
 - Swagger para **Documentação**
 
 ### Documentação Swagger
-![Captura de tela_19-12-2024_12817_localhost](https://github.com/user-attachments/assets/dbed51fa-3902-4ff7-b807-aabf780c5591)
+![Captura de tela_19-12-2024_12817_localhost](https://github.com/user-attachments/assets/da846f5b-bb54-4881-9695-30e6d1bce029)
 
 ### Modelagem
-![Captura de tela 2024-12-19 120549](https://github.com/user-attachments/assets/85e5a9dc-0d3c-408d-aebd-484539a4b94c)
+![Captura de tela 2024-12-19 120549](https://github.com/user-attachments/assets/bc8532c5-b75c-4998-9d9f-47a9c75563b3)
 
 ### Passo a passo para inicialização
 
